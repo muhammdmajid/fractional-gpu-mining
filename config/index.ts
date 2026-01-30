@@ -47,6 +47,7 @@ export const SEO_CONFIG = {
     description:
       "Fractional GPU Mining is a next-generation platform for renting and sharing GPU power for crypto mining, AI workloads, and Web3 applications. Affordable, scalable, and decentralized GPU resources at your fingertips.",
 
+      
     // 🏷️ Expanded Keywords (30+ optimized for crypto, AI, Web3)
     keywords: [
       "Fractional GPU",
