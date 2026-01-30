@@ -1,0 +1,37 @@
+#sudo chmod +x db.sh
+#sudo ./db.sh
+
+
+
+Fix Command (Manual Test)
+
+Try this:
+
+cd /opt/pgadmin4
+source venv/bin/activate
+python3 -m pgadmin4.pgAdmin4
+
+
+sudo nano /etc/systemd/system/pgadmin.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/pgadmin4
+Environment="PGADMIN_CONFIG_FILE=/opt/pgadmin4/config_local.py"
+ExecStart=/opt/pgadmin4/venv/bin/python3 -m pgadmin4.pgAdmin4
+Restart=always
+RestartSec=10
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart pgadmin
+sudo systemctl status pgadmin
+
+sudo journalctl -u pgadmin -n 20 --no-pager
+
+POSTGRES_USER: gpuuserdb
+POSTGRES_PASSWORD: Imr@n786
+POSTGRES_DB: gpuminingdb
+Server IP: 199.192.23.73
+Port: 5432
+

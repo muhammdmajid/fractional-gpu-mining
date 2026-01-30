@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
+
+/* ===============================
+   🌐 THEME CONFIG FOR BITCOIN GPU MINING SYSTEM
+   =============================== */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Sidebar Colors */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  /* Chart Colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* General Colors */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+
+  /* Primary Shades */
+  --color-primary-50: oklch(0.95 0.15 60);  
+  --color-primary-100: oklch(0.90 0.15 60);
+  --color-primary-200: oklch(0.3000 0.18 60);
+  --color-primary-300: oklch(0.70 0.20 60);
+  --color-primary-400: oklch(0.65 0.22 60);
+  --color-primary-500: var(--primary);
+  --color-primary-600: oklch(0.55 0.22 60);
+  --color-primary-700: oklch(0.45 0.22 60);
+  --color-primary-800: oklch(0.40 0.22 60);
+  --color-primary-900: oklch(0.35 0.22 60);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ===============================
+   🎨 BITCOIN & GPU COLOR PALETTE
+   =============================== */
+@theme {
+  --color-btc-orange: #F7931A;        
+  --color-btc-orange-dark: #C26D0C;   
+  --color-gpu-green: #00FF99;         
+  --color-gpu-blue: #0FF0FC;          
+  --color-gpu-purple: #6C63FF;        
+  --color-gpu-dark: #0D1117;          
+  --color-gpu-gray: #1E2329;          
+  --color-hash-gold: linear-gradient(135deg, #F7931A, #FFD53000);
+
+  /* Chart Colors */
+  --color-chart-1: #F7931A; /* Bitcoin orange */
+  --color-chart-2: #00FF99; /* GPU neon green */
+  --color-chart-3: #0FF0FC; /* Tech cyan */
+  --color-chart-4: #6C63FF; /* GPU purple */
+  --color-chart-5: #FFD53000; /* Golden highlight */
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* 🌞 Light Mode */
+  --background: #F9FAFB;              /* light gray base */
+  --foreground: #111827;              /* dark text */
+  --primary: var(--color-btc-orange); /* Bitcoin orange */
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-gpu-green);
+  --secondary-foreground: #000000;
+  --accent: var(--color-gpu-blue);
+  --accent-foreground: #000000;
+  --card: #ffffff;                    /* white cards */
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --muted: #F3F4F6;                   /* soft gray sections */
+  --muted-foreground: #6B723000;
+  --border: #E5E7EB;
+  --ring: var(--color-btc-orange);
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: var(--color-btc-orange);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-gpu-green);
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #E5E7EB;
+  --sidebar-ring: var(--color-gpu-green);
+}
+
+/* ===============================
+   🌙 Dark Mode
+   =============================== */
+.dark {
+  --background: #0B0F13;
+  --foreground: #E6E6E6;
+  --primary: #F7931A;
+  --primary-foreground: #000000;
+  --secondary: #00FF99;
+  --secondary-foreground: #000000;
+  --accent: #0FF0FC;
+  --accent-foreground:#E6E6E6;
+  --card: #161B22;
+  --card-foreground: #E6E6E6;
+  --popover: #161B22;
+  --popover-foreground: #E6E6E6;
+  --muted: #2A2F36;
+  --muted-foreground: #9CA3AF;
+  --border: #30363D;
+  --ring: #00FF99;
+
+  /* Sidebar */
+  --sidebar: #161B22;
+  --sidebar-foreground: #E6E6E6;
+  --sidebar-primary: #F7931A;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #00FF99;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #30363D;
+  --sidebar-ring: #00FF99;
+}
+

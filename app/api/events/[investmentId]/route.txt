@@ -1,0 +1,248 @@
+// app/api/mining/[investmentId]/status/route.ts
+import { eq, gte, sum, and } from "drizzle-orm";
+import { db } from "@/db";
+import {
+  gpu_mining_hourly,
+  gpu_mining_daily,
+  gpu_mining_monthly,
+} from "@/db/schema";
+import type { MiningStatusStream } from "@/types/fractional-mining-profit";
+import { ServerResponse } from "@/types";
+import { MINING_STATUS_INTERVAL } from "@/lib/constants";
+import { getErrorMessage } from "@/lib/handle-error";
+
+// ============================
+// ✅ Time Window Constants
+// ============================
+const HOURS_IN_MS = 60 * 60 * 1000;
+const DAYS_IN_MS = 24 * HOURS_IN_MS;
+
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ investmentId: string }> }
+) {
+  let investmentId: string | undefined;
+
+  try {
+    const { params } = context;
+    const parsed = await params;
+    investmentId = parsed?.investmentId;
+
+    if (!investmentId || typeof investmentId !== "string") {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: { investmentId: { message: "Invalid or missing investmentId" } },
+          status: "error",
+          statusCode: 400,
+        } satisfies ServerResponse<null>),
+        { status: 400 }
+      );
+    }
+  } catch (err) {
+    console.error("❌ Param parsing error:", err);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Invalid request parameters",
+        status: "error",
+        statusCode: 400,
+      } satisfies ServerResponse<null>),
+      { status: 400 }
+    );
+  }
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const signal = req.signal;
+      let isClosed = false;
+
+      const safeEnqueue = (payload: ServerResponse<MiningStatusStream>) => {
+        try {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+        } catch (err) {
+          console.error("❌ Stream enqueue error:", err);
+          isClosed = true;
+          controller.close();
+        }
+      };
+
+      const closeStream = (reason?: string) => {
+        if (!isClosed) {
+          if (reason) console.warn("🔒 Closing SSE stream:", reason);
+          isClosed = true;
+          try {
+            controller.close();
+          } catch (err) {
+            console.error("❌ Error closing stream:", err);
+          }
+        }
+      };
+
+      const pushUpdate = async (): Promise<void> => {
+        if (isClosed) return;
+
+        try {
+          // 1️⃣ Fetch investment
+          const investmentRecord = await db.query.miningInvestmentsTable.findFirst({
+            where: (t) => eq(t.id, investmentId!),
+          });
+
+          if (!investmentRecord) {
+            safeEnqueue({
+              success: false,
+              error: { investmentId: { message: "Investment not found" } },
+              message: "Invalid request",
+              status: "error",
+              statusCode: 404,
+            });
+            closeStream("Investment not found");
+            return;
+          }
+
+          // 2️⃣ Define time windows
+          const now = new Date();
+          const cutoff7Hours = new Date(now.getTime() - 7 * HOURS_IN_MS);
+          const cutoff7Days = new Date(now.getTime() - 7 * DAYS_IN_MS);
+          const cutoff7Months = new Date();
+          cutoff7Months.setMonth(cutoff7Months.getMonth() - 7);
+
+          const currentHourStart = new Date(now);
+          currentHourStart.setMinutes(0, 0, 0);
+
+          const currentDayStart = new Date(now);
+          currentDayStart.setHours(0, 0, 0, 0);
+
+          const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+          // 3️⃣ Fetch raw arrays safely
+          const [hourlyLast7, dailyLast7, monthlyLast7] = await Promise.all([
+            db.query.gpu_mining_hourly.findMany({
+              where: and(
+                eq(gpu_mining_hourly.plan_id, investmentId!),
+                gte(gpu_mining_hourly.hour_ts, cutoff7Hours)
+              ),
+              orderBy: (t, { desc }) => desc(t.hour_ts),
+              limit: 7,
+            }),
+            db.query.gpu_mining_daily.findMany({
+              where: and(
+                eq(gpu_mining_daily.plan_id, investmentId!),
+                gte(gpu_mining_daily.day_start, cutoff7Days)
+              ),
+              orderBy: (t, { desc }) => desc(t.day_start),
+              limit: 7,
+            }),
+            db.query.gpu_mining_monthly.findMany({
+              where: and(
+                eq(gpu_mining_monthly.plan_id, investmentId!),
+                gte(gpu_mining_monthly.month_start, cutoff7Months)
+              ),
+              orderBy: (t, { desc }) => desc(t.month_start),
+              limit: 7,
+            }),
+          ]);
+
+          // 4️⃣ Aggregate totals safely
+          const [[profit7Hours], [profit7Days], [profit7Months], [profitPreviousHour], [profitPreviousDay], [profitPreviousMonth]] =
+            await Promise.all([
+              db
+                .select({ total: sum(gpu_mining_hourly.profit) })
+                .from(gpu_mining_hourly)
+                .where(and(eq(gpu_mining_hourly.plan_id, investmentId!), gte(gpu_mining_hourly.hour_ts, cutoff7Hours))),
+              db
+                .select({ total: sum(gpu_mining_daily.profit) })
+                .from(gpu_mining_daily)
+                .where(and(eq(gpu_mining_daily.plan_id, investmentId!), gte(gpu_mining_daily.day_start, cutoff7Days))),
+              db
+                .select({ total: sum(gpu_mining_monthly.profit) })
+                .from(gpu_mining_monthly)
+                .where(and(eq(gpu_mining_monthly.plan_id, investmentId!), gte(gpu_mining_monthly.month_start, cutoff7Months))),
+              db
+                .select({ total: sum(gpu_mining_hourly.profit) })
+                .from(gpu_mining_hourly)
+                .where(and(eq(gpu_mining_hourly.plan_id, investmentId!), gte(gpu_mining_hourly.hour_ts, currentHourStart))),
+              db
+                .select({ total: sum(gpu_mining_daily.profit) })
+                .from(gpu_mining_daily)
+                .where(and(eq(gpu_mining_daily.plan_id, investmentId!), gte(gpu_mining_daily.day_start, currentDayStart))),
+              db
+                .select({ total: sum(gpu_mining_monthly.profit) })
+                .from(gpu_mining_monthly)
+                .where(and(eq(gpu_mining_monthly.plan_id, investmentId!), gte(gpu_mining_monthly.month_start, currentMonthStart))),
+            ]);
+
+          // 5️⃣ Prepare response
+          const payload: ServerResponse<MiningStatusStream> = {
+            success: true,
+            status: "success",
+            message: "Mining performance fetched successfully",
+            data: {
+              depositAmount: investmentRecord.depositAmount,
+              miningCycle: investmentRecord.miningCycle,
+              startDate: investmentRecord.startDate,
+
+              // Aggregated totals
+              profitLast7Hours: profit7Hours?.total ?? "0",
+              profitLast7Days: profit7Days?.total ?? "0",
+              profitLast7Months: profit7Months?.total ?? "0",
+
+              // Current values
+              profitPreviousHour: profitPreviousHour?.total ?? "0",
+              profitPreviousDay: profitPreviousDay?.total ?? "0",
+              profitPreviousMonth: profitPreviousMonth?.total ?? "0",
+
+              // Raw arrays
+              last7HoursData: hourlyLast7 ?? [],
+              last7DaysData: dailyLast7 ?? [],
+              last7MonthsData: monthlyLast7 ?? [],
+            },
+            statusCode: 200,
+          };
+
+          safeEnqueue(payload);
+
+          // 6️⃣ Close if inactive
+          if (investmentRecord.status !== "active") {
+            closeStream("Investment inactive");
+            return;
+          }
+
+          // 7️⃣ Repeat after interval
+          await new Promise((resolve) => setTimeout(resolve, MINING_STATUS_INTERVAL));
+          pushUpdate();
+        } catch (err) {
+          console.error("❌ SSE processing error:", err);
+          safeEnqueue({
+            success: false,
+            error: getErrorMessage(err),
+            message: "Error while streaming mining status",
+            status: "error",
+            statusCode: 500,
+          });
+          closeStream("Fatal error");
+        }
+      };
+
+      // Handle abort signals
+      signal.addEventListener("abort", () => {
+        closeStream("Client aborted connection");
+      });
+
+      pushUpdate();
+    },
+    cancel(reason) {
+      console.warn("⚠️ SSE stream cancelled:", reason);
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+    },
+  });
+}
