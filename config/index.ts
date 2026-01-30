@@ -2,13 +2,12 @@
 // 🌐 SEO + System Configuration
 // ================================
 
-
 export const SEO_CONFIG = {
   // 🔖 Brand & Identity
   fullName: "Fractional GPU Mining Platform", // Full platform name
-  name: "Fractional GPU",                // Short brand name
+  name: "Fractional GPU", // Short brand name
   slogan: "Mining power made affordable and accessible.", // Catchy tagline
-  logoSrc: `${process.env.NEXT_PUBLIC_APP_URL!}/logo.png`,   // Path to primary logo
+  logoSrc: `${process.env.NEXT_PUBLIC_APP_URL!}/logo.png`, // Path to primary logo
   logobgSrc: `${process.env.NEXT_PUBLIC_APP_URL!}/logo.png`, // Optional background/alt logo
 
   // 📝 General Description
@@ -27,7 +26,8 @@ export const SEO_CONFIG = {
     email: "admin@fgpumining.site",
     phone: "+971-50-123-4567",
     address: "123 Sheikh Zayed Road, Dubai, United Arab Emirates",
-    location: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d925149.3304236719!2d54.04430157928438!3d25.072578887162763!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2s!4v1759466972770!5m2!1sen!2s",
+    location:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d925149.3304236719!2d54.04430157928438!3d25.072578887162763!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2s!4v1759466972770!5m2!1sen!2s",
     socialMediaLinks: {
       facebook: "https://facebook.com",
       twitter: "https://twitter.com",
@@ -47,7 +47,6 @@ export const SEO_CONFIG = {
     description:
       "Fractional GPU Mining is a next-generation platform for renting and sharing GPU power for crypto mining, AI workloads, and Web3 applications. Affordable, scalable, and decentralized GPU resources at your fingertips.",
 
-      
     // 🏷️ Expanded Keywords (30+ optimized for crypto, AI, Web3)
     keywords: [
       "Fractional GPU",
@@ -81,7 +80,7 @@ export const SEO_CONFIG = {
       "GPU Acceleration for AI",
       "Sustainable Crypto Mining",
       "High Performance GPU Cloud",
-      "Crypto Mining with AI"
+      "Crypto Mining with AI",
     ],
 
     // 🖼️ Open Graph (Facebook, LinkedIn previews)
@@ -106,7 +105,7 @@ export const SEO_CONFIG = {
         "https://facebook.com/",
         "https://twitter.com/",
         "https://linkedin.com/",
-        "https://instagram.com/"
+        "https://instagram.com/",
       ],
       description:
         "Fractional GPU Mining Platform allows users to rent or share GPU power for mining and AI workloads. Decentralized, affordable, and scalable cloud GPU resources.",
@@ -115,8 +114,8 @@ export const SEO_CONFIG = {
         contactType: "customer support",
         email: "",
         phone: "",
-        url: `${process.env.NEXT_PUBLIC_APP_URL!}/contact`
-      }
+        url: `${process.env.NEXT_PUBLIC_APP_URL!}/contact`,
+      },
     },
 
     // 🌐 Canonical Base URL
@@ -132,20 +131,19 @@ export const PAYMENT_WITHDRAWAL_POLICY = {
   ROUTE: "/payment-withdrawal-policy" as const,
   LAST_UPDATED: "August 28, 2025" as const,
   WITHDRAWAL_CHARGE: 0.02 as const, // 02%
-  MINING_USAGE_FEE: 0.20 as const,  // 20%
-  MIN_DEPOSIT: 1 as const,         // in USD/USDT equivalent
+  MINING_USAGE_FEE: 0.2 as const, // 20%
+  MIN_DEPOSIT: 1 as const, // in USD/USDT equivalent
   MAX_DEPOSIT: 100000 as const,
   MIN_WITHDRAWAL: 1 as const,
   MAX_WITHDRAWAL: 50000 as const,
-   // ✅ Constants for referral rewards
-   DEFAULT_REWARD_AMOUNT : "1.0",
-   DEFAULT_REWARD_CURRENCY :"USDT",
+  // ✅ Constants for referral rewards
+  DEFAULT_REWARD_AMOUNT: "1.0",
+  DEFAULT_REWARD_CURRENCY: "USDT",
   // ---------------------- CONSTANT ACCOUNT INFO ----------------------
   FINANCE_ACCOUNT_NAME: "BNB Smart Chain(BEP20)",
   FINANCE_ACCOUNT_NUMBER: "0xa359b4db7bc68e05ff3329806aa48ebd69276b8f",
-  CURRENCIES: ["USDT"]
+  CURRENCIES: ["USDT"],
 } as const;
-
 
 // ================================
 // ⚙️ System Configuration
@@ -154,7 +152,6 @@ export const SYSTEM_CONFIG = {
   redirectBeforeSignIn: "/auth/sign-in",
   redirectAfterSignIn: "/dashboard/overview",
   redirectAfterSignUp: "/dashboard/overview",
-
 };
 
 // ================================
@@ -168,10 +165,3 @@ export const ADMIN_CONFIG = {
 // 🐞 Database Debug Logger
 // ================================
 export const DB_DEV_LOGGER = false;
-
-
-
-
-
-
-
