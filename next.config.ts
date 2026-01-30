@@ -30,6 +30,7 @@ const trustedOrigins = (process.env.TRUSTED_ORIGINS || "")
       "https://localhost:3000",
       "http://localhost:3000",
       "http://localhost:80",
+      "https://fgpu-mining.netlify.app"
     ];
 
 // ⚙️ Main Next.js Configuration
@@ -41,6 +42,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
+      {protocol: "https",hostname:"fgpu-mining.netlify.app"},
       { protocol: "https", hostname: "**.unsplash.com" },
       { protocol: "http", hostname: "localhost" },
       { protocol: "https", hostname: "localhost" },
